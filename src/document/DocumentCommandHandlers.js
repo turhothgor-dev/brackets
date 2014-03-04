@@ -750,6 +750,8 @@ define(function (require, exports, module) {
                 return;
             }
             
+            doc.isSaving = true;
+            
             // First, write document's current text to new file
             newFile = FileSystem.getFileForPath(path);
             
@@ -758,6 +760,8 @@ define(function (require, exports, module) {
             // ignoring warnings about the contents being modified outside of
             // the editor.
             FileUtils.writeText(newFile, doc.getText(), true).done(function () {
+                doc.isSaving = false;
+                
                 // If there were unsaved changes before Save As, they don't stay with the old
                 // file anymore - so must revert the old doc to match disk content.
                 // Only do this if the doc was dirty: doRevert on a file that is not dirty and
@@ -770,6 +774,8 @@ define(function (require, exports, module) {
                     openNewFile();
                 }
             }).fail(function (error) {
+                doc.isSaving = false;
+                
                 _showSaveFileError(error, path)
                     .done(function () {
                         result.reject(error);
@@ -823,7 +829,7 @@ define(function (require, exports, module) {
             doc = (commandData && commandData.doc) || activeDoc,
             settings;
         
-        if (doc) {
+        if (doc && !doc.isSaving) {
             if (doc.isUntitled()) {
                 if (doc === activeDoc) {
                     settings = {
