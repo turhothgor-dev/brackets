@@ -34,7 +34,9 @@ define(function (require, exports, module) {
     
     require("thirdparty/path-utils/path-utils.min");
 
-    var Dialogs                = require("widgets/Dialogs"),
+    var CommandManager         = require("command/CommandManager"),
+        Commands               = require("command/Commands"),
+        Dialogs                = require("widgets/Dialogs"),
         PreferencesManager     = require("preferences/PreferencesManager"),
         ProjectManager         = require("project/ProjectManager"),
         StringUtils            = require("utils/StringUtils"),
@@ -120,6 +122,13 @@ define(function (require, exports, module) {
 
         return dialog;
     }
+
+    function showPreferencesDialog() {
+        console.log("xxx");
+    }
+
+    // Command
+    CommandManager.register(Strings.CMD_SETTINGS, Commands.FILE_SETTINGS, showPreferencesDialog);
 
     // For unit testing
     exports._validateBaseUrl                = _validateBaseUrl;
