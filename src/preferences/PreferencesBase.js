@@ -1121,6 +1121,10 @@ define(function (require, exports, module) {
             return this._knownPrefs[id];
         },
 
+        getKnownPreferences: function () {
+            return Object.keys(this._knownPrefs);
+        },
+
         /**
          * @private
          *

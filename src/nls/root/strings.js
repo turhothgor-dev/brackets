@@ -372,6 +372,9 @@ define({
     "BASEURL_ERROR_INVALID_CHAR"           : "Special characters like '{0}' must be %-encoded.",
     "BASEURL_ERROR_UNKNOWN_ERROR"          : "Unknown error parsing Base URL",
     
+    // Settings dialog
+    "SETTINGS"                             : "Settings",
+
     // CSS Quick Edit
     "BUTTON_NEW_RULE"                      : "New Rule",
     

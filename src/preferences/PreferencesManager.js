@@ -59,6 +59,14 @@ define(function (require, exports, module) {
      */
     var CLIENT_ID_PREFIX = "com.adobe.brackets.";
     
+    /**
+     * Key under which information is stored about extensions who use preferences
+     * These are stored here so we can track also uninstalled extensions which left entries
+     * @const
+     * @type {string}
+     */
+    var EXTENSIONS_KEY = "registered.extensions";
+
     // Private Properties
     var preferencesKey,
         prefStorage,
@@ -363,6 +371,17 @@ define(function (require, exports, module) {
         preferencesManager.setDefaultFilename(currentFile);
     }
     
+    function _registerExtension(id, options) {
+        var extensions = get(EXTENSIONS_KEY) || {};
+        extensions[id] = options || {};
+        extensions[id].id = id;
+        set(EXTENSIONS_KEY, extensions);
+    }
+
+    function getExtensions() {
+        return get(EXTENSIONS_KEY) || {};
+    }
+
     /**
      * Creates an extension-specific preferences manager using the prefix given.
      * A `.` character will be appended to the prefix. So, a preference named `foo`
@@ -371,7 +390,8 @@ define(function (require, exports, module) {
      * 
      * @param {string} prefix Prefix to be applied
      */
-    function getExtensionPrefs(prefix) {
+    function getExtensionPrefs(prefix, options) {
+        _registerExtension(prefix, options);
         return preferencesManager.getPrefixedSystem(prefix);
     }
     
@@ -665,6 +685,8 @@ define(function (require, exports, module) {
     exports.on                  = preferencesManager.on.bind(preferencesManager);
     exports.off                 = preferencesManager.off.bind(preferencesManager);
     exports.getPreference       = preferencesManager.getPreference.bind(preferencesManager);
+    exports.getKnownPreferences = preferencesManager.getKnownPreferences.bind(preferencesManager);
+    exports.getExtensions       = getExtensions;
     exports.getExtensionPrefs   = getExtensionPrefs;
     exports.setValueAndSave     = setValueAndSave;
     exports.getViewState        = getViewState;

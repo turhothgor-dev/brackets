@@ -34,14 +34,16 @@ define(function (require, exports, module) {
     
     require("thirdparty/path-utils/path-utils.min");
 
-    var CommandManager         = require("command/CommandManager"),
-        Commands               = require("command/Commands"),
-        Dialogs                = require("widgets/Dialogs"),
-        PreferencesManager     = require("preferences/PreferencesManager"),
-        ProjectManager         = require("project/ProjectManager"),
-        StringUtils            = require("utils/StringUtils"),
-        Strings                = require("strings"),
-        SettingsDialogTemplate = require("text!htmlContent/project-settings-dialog.html");
+    var _                             = require("thirdparty/lodash"),
+        CommandManager                = require("command/CommandManager"),
+        Commands                      = require("command/Commands"),
+        Dialogs                       = require("widgets/Dialogs"),
+        PreferencesManager            = require("preferences/PreferencesManager"),
+        ProjectManager                = require("project/ProjectManager"),
+        StringUtils                   = require("utils/StringUtils"),
+        Strings                       = require("strings"),
+        SettingsDialogTemplate        = require("text!htmlContent/settings-dialog.html"),
+        ProjectSettingsDialogTemplate = require("text!htmlContent/project-settings-dialog.html");
 
     /**
      * Validate that text string is a valid base url which should map to a server folder
@@ -101,7 +103,7 @@ define(function (require, exports, module) {
             Strings      : Strings
         };
         
-        dialog = Dialogs.showModalDialogUsingTemplate(Mustache.render(SettingsDialogTemplate, templateVars));
+        dialog = Dialogs.showModalDialogUsingTemplate(Mustache.render(ProjectSettingsDialogTemplate, templateVars));
         
         dialog.done(function (id) {
             if (id === Dialogs.DIALOG_BTN_OK) {
@@ -124,7 +126,56 @@ define(function (require, exports, module) {
     }
 
     function showPreferencesDialog() {
-        console.log("xxx");
+        var extensions = PreferencesManager.getExtensions();
+        var preferences = PreferencesManager.getKnownPreferences();
+        var mainPrefs = [];
+
+        preferences.forEach(function (key) {
+            var pref = PreferencesManager.getPreference(key);
+            var ext = _.find(extensions, function (ext) {
+                return key.indexOf(ext.id + ".") === 0;
+            });
+            if (!ext) {
+                pref.key = key;
+                pref.fullKey = key;
+                mainPrefs.push(pref);
+            } else {
+                ext.prefs = ext.prefs || [];
+                pref.key = key.substring(ext.id.length + 1);
+                pref.fullKey = key;
+                ext.prefs.push(pref);
+            }
+        });
+
+        extensions = _.sortBy(_.compact(_.map(extensions, function (options, id) {
+            if (!options.prefs || options.prefs.length === 0) {
+                return;
+            }
+            return {
+                id: id,
+                title: options.title || id,
+                prefs: options.prefs
+            };
+        })), "title");
+
+        var templateVars = {
+            MainPrefs    : mainPrefs,
+            Extensions   : extensions,
+            Strings      : Strings
+        };
+
+        var dialog = Dialogs.showModalDialogUsingTemplate(Mustache.render(SettingsDialogTemplate, templateVars));
+        dialog.done(function (id) {
+            if (id === Dialogs.DIALOG_BTN_OK) {
+                console.error("TODO: restart brackets to apply changes?");
+            }
+        });
+
+        dialog.getElement()
+            .find(".nav-tabs a").on("click", function (e) {
+                e.preventDefault();
+                $(this).tab("show");
+            });
     }
 
     // Command
