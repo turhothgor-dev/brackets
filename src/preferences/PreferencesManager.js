@@ -371,15 +371,28 @@ define(function (require, exports, module) {
         preferencesManager.setDefaultFilename(currentFile);
     }
     
+    var _activeExtensions = {};
+
     function _registerExtension(id, options) {
         var extensions = get(EXTENSIONS_KEY) || {};
+
         extensions[id] = options || {};
         extensions[id].id = id;
+
+        delete extensions[id].active;
+        _activeExtensions[id] = true;
+
         set(EXTENSIONS_KEY, extensions);
     }
 
     function getExtensions() {
-        return get(EXTENSIONS_KEY) || {};
+        var result = get(EXTENSIONS_KEY) || {};
+        _.forEach(result, function (obj, id) {
+            if (_activeExtensions[id]) {
+                obj.active = true;
+            }
+        });
+        return result;
     }
 
     /**

@@ -147,15 +147,27 @@ define(function (require, exports, module) {
             }
         });
 
-        extensions = _.sortBy(_.compact(_.map(extensions, function (options, id) {
-            if (!options.prefs || options.prefs.length === 0) {
-                return;
+        extensions = _.sortBy(_.compact(_.map(extensions, function (extensionInfo, id) {
+            if (extensionInfo.active) {
+
+                if (!extensionInfo.prefs || extensionInfo.prefs.length === 0) {
+                    return;
+                }
+                return {
+                    id: id,
+                    title: extensionInfo.title || id,
+                    prefs: extensionInfo.prefs
+                };
+
+            } else {
+
+                return {
+                    id: id,
+                    title: extensionInfo.title || id,
+                    removed: true
+                };
+
             }
-            return {
-                id: id,
-                title: options.title || id,
-                prefs: options.prefs
-            };
         })), "title");
 
         var templateVars = {

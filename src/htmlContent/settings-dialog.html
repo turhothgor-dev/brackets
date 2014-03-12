@@ -23,6 +23,9 @@
                 </div>
                 {{#Extensions}}
                 <div class="tab-pane" id="settings-dialog-{{id}}">
+                    {{#removed}}
+                        {{Strings.EXTENSION_WAS_REMOVED}}
+                    {{/removed}}
                     {{#prefs}}
                     <label class="span3">{{key}}</label>
                     {{/prefs}}

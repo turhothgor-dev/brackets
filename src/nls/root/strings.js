@@ -374,6 +374,7 @@ define({
     
     // Settings dialog
     "SETTINGS"                             : "Settings",
+    "EXTENSION_WAS_REMOVED"                : "Extension was removed but might have left some settings behind.",
 
     // CSS Quick Edit
     "BUTTON_NEW_RULE"                      : "New Rule",
