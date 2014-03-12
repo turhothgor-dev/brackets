@@ -171,9 +171,13 @@ define(function (require, exports, module) {
         })), "title");
 
         var templateVars = {
-            MainPrefs    : mainPrefs,
-            Extensions   : extensions,
-            Strings      : Strings
+            MainPrefs       : mainPrefs,
+            Extensions      : extensions,
+            Strings         : Strings,
+            getPrefTemplate : function () {
+                // this.type === "boolean"
+                return "<label class='span3'>" + this.key + "</label>";
+            }
         };
 
         var dialog = Dialogs.showModalDialogUsingTemplate(Mustache.render(SettingsDialogTemplate, templateVars));
