@@ -43,6 +43,7 @@ define(function (require, exports, module) {
         StringUtils                   = require("utils/StringUtils"),
         Strings                       = require("strings"),
         SettingsDialogTemplate        = require("text!htmlContent/settings-dialog.html"),
+        SettingsDialogTemplateParts   = require("text!htmlContent/settings-dialog-parts.html"),
         ProjectSettingsDialogTemplate = require("text!htmlContent/project-settings-dialog.html");
 
     /**
@@ -170,17 +171,38 @@ define(function (require, exports, module) {
             }
         })), "title");
 
+        var $parts = $(SettingsDialogTemplateParts);
         var templateVars = {
             MainPrefs       : mainPrefs,
             Extensions      : extensions,
             Strings         : Strings,
             getPrefTemplate : function () {
-                // this.type === "boolean"
-                return "<label class='span3'>" + this.key + "</label>";
+                var template = $parts.children(this.type).html();
+                if (!template) {
+                    console.log(this.type);
+                    template = $parts.children("other").html();
+                }
+                return Mustache.render(template, {
+                    key: this.fullKey,
+                    title: this.key
+                });
             }
         };
 
+
         var dialog = Dialogs.showModalDialogUsingTemplate(Mustache.render(SettingsDialogTemplate, templateVars));
+
+        dialog.getElement().find("*[name]").each(function () {
+            var $this = $(this),
+                key = $this.attr("name"),
+                value = PreferencesManager.get(key);
+            if ($this.attr("type") === "checkbox") {
+                $this.prop("checked", value);
+            } else {
+                $this.val(value);
+            }
+        });
+
         dialog.done(function (id) {
             if (id === Dialogs.DIALOG_BTN_OK) {
                 console.error("TODO: restart brackets to apply changes?");
